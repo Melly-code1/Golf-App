@@ -106,3 +106,29 @@ export default function UploadPhoto() {
     </>
   );
 }
+// ProfileScreen.js
+import React, { useState } from 'react';
+import { View, TextInput, Button } from 'react-native';
+import { db, auth } from './firebaseConfig';
+import { doc, setDoc } from 'firebase/firestore';
+
+export default function ProfileScreen() {
+  const [instagram, setInstagram] = useState('');
+  const [facebook, setFacebook] = useState('');
+
+  const saveLinks = async () => {
+    await setDoc(doc(db, 'users', auth.currentUser.uid), {
+      instagram,
+      facebook
+    });
+  };
+
+  return (
+    <View>
+      <TextInput placeholder="Instagram URL" onChangeText={setInstagram} />
+      <TextInput placeholder="Facebook URL" onChangeText={setFacebook} />
+      <Button title="Save Links" onPress={saveLinks} />
+    </View>
+  );
+}
+
