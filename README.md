@@ -44,3 +44,31 @@ export default function AuthScreen() {
     </View>
   );
 }
+
+// AddGameScreen.js
+import React, { useState } from 'react';
+import { View, TextInput, Button } from 'react-native';
+import { db, auth } from './firebaseConfig';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+
+export default function AddGameScreen() {
+  const [course, setCourse] = useState('');
+  const [score, setScore] = useState('');
+
+  const handleAddGame = async () => {
+    await addDoc(collection(db, 'games'), {
+      userId: auth.currentUser.uid,
+      course,
+      score: parseInt(score),
+      createdAt: Timestamp.now()
+    });
+  };
+
+  return (
+    <View>
+      <TextInput placeholder="Course Name" onChangeText={setCourse} />
+      <TextInput placeholder="Score" keyboardType="numeric" onChangeText={setScore} />
+      <Button title="Save Game" onPress={handleAddGame} />
+    </View>
+  );
+}
