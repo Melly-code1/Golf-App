@@ -72,3 +72,37 @@ export default function AddGameScreen() {
     </View>
   );
 }
+
+
+// UploadPhoto.js
+import React from 'react';
+import { Button, Image } from 'react-native';
+import * as ImagePicker from 'react-native-image-picker';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from './firebaseConfig';
+
+export default function UploadPhoto() {
+  const [imageUri, setImageUri] = React.useState(null);
+
+  const pickImage = async () => {
+    ImagePicker.launchImageLibrary({ mediaType: 'photo' }, async (response) => {
+      if (response.assets) {
+        const uri = response.assets[0].uri;
+        setImageUri(uri);
+
+        const responseBlob = await fetch(uri).then(res => res.blob());
+        const storageRef = ref(storage, `photos/${Date.now()}.jpg`);
+        await uploadBytes(storageRef, responseBlob);
+        const downloadURL = await getDownloadURL(storageRef);
+        console.log('Uploaded to:', downloadURL);
+      }
+    });
+  };
+
+  return (
+    <>
+      <Button title="Upload Photo" onPress={pickImage} />
+      {imageUri && <Image source={{ uri: imageUri }} style={{ width: 200, height: 200 }} />}
+    </>
+  );
+}
